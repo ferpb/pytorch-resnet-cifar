@@ -101,11 +101,18 @@ def main(args):
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
 
-    # CIFAR-10 mean and std
-    normalize = transforms.Normalize(
-        mean=[0.4914, 0.4822, 0.4465],
-        std=[0.2470, 0.2435, 0.2616],
-    )
+    if args.dataset == "cifar10":
+        normalize = transforms.Normalize(
+            mean=[0.4914, 0.4822, 0.4465],
+            std=[0.2470, 0.2435, 0.2616],
+        )
+    elif args.dataset == "cifar100":
+        normalize = transforms.Normalize(
+            mean=[0.5071, 0.4865, 0.4409],
+            std=[0.2673, 0.2564, 0.2762],
+        )
+    else:
+        raise ValueError()
 
     train_transform = transforms.Compose(
         [
@@ -123,11 +130,20 @@ def main(args):
         ]
     )
 
-    train_data = datasets.CIFAR10("./data", train=True, download=True, transform=train_transform)
-    train_eval_data = datasets.CIFAR10("./data", train=True, download=True, transform=eval_transform)
-    test_data = datasets.CIFAR10("./data", train=False, download=True, transform=eval_transform)
+    if args.dataset == "cifar10":
+        train_data = datasets.CIFAR10("./data", train=True, download=True, transform=train_transform)
+        train_eval_data = datasets.CIFAR10("./data", train=True, download=True, transform=eval_transform)
+        test_data = datasets.CIFAR10("./data", train=False, download=True, transform=eval_transform)
+        num_classes = 10
+    elif args.dataset == "cifar100":
+        train_data = datasets.CIFAR100("./data", train=True, download=True, transform=train_transform)
+        train_eval_data = datasets.CIFAR100("./data", train=True, download=True, transform=eval_transform)
+        test_data = datasets.CIFAR100("./data", train=False, download=True, transform=eval_transform)
+        num_classes = 100
+    else:
+        raise ValueError()
 
-    orig_model = MODELS[args.model]()
+    orig_model = MODELS[args.model](num_classes)
     orig_model.to(args.device)
     model = torch.compile(orig_model)
 
@@ -223,6 +239,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="resnet20", choices=CONFIGS.keys())
+    parser.add_argument("--dataset", default="cifar10", choices=["cifar10", "cifar100"])
     parser.add_argument("--log", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", type=str, default="cuda")

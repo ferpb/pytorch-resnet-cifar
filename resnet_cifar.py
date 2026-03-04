@@ -46,26 +46,26 @@ class BasicBlock(nn.Module):
 
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes=10, shorcut_option="A"):
+    def __init__(self, block, num_blocks, num_classes=10, shortcut_option="A"):
         super().__init__()
 
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(16)
 
         self.in_planes = 16
-        self.stage1 = self._make_stage(block, 16, num_blocks, 1, shorcut_option)
-        self.stage2 = self._make_stage(block, 32, num_blocks, 2, shorcut_option)
-        self.stage3 = self._make_stage(block, 64, num_blocks, 2, shorcut_option)
+        self.stage1 = self._make_stage(block, 16, num_blocks, 1, shortcut_option)
+        self.stage2 = self._make_stage(block, 32, num_blocks, 2, shortcut_option)
+        self.stage3 = self._make_stage(block, 64, num_blocks, 2, shortcut_option)
 
         self.linear = nn.Linear(64, num_classes)
 
         self.apply(self._init_weights)
 
-    def _make_stage(self, block_cls, planes, num_blocks, stride, shotcut_option):
+    def _make_stage(self, block_cls, planes, num_blocks, stride, shortcut_option):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
         for stride in strides:
-            layers.append(block_cls(self.in_planes, planes, stride, shotcut_option))
+            layers.append(block_cls(self.in_planes, planes, stride, shortcut_option))
             self.in_planes = planes
         return nn.Sequential(*layers)
 
@@ -91,25 +91,25 @@ class ResNet(nn.Module):
         return x
 
 
-def resnet20():
-    return ResNet(BasicBlock, 3)
+def resnet20(num_classes=10):
+    return ResNet(BasicBlock, 3, num_classes)
 
 
-def resnet32():
-    return ResNet(BasicBlock, 5)
+def resnet32(num_classes=10):
+    return ResNet(BasicBlock, 5, num_classes)
 
 
-def resnet44():
-    return ResNet(BasicBlock, 7)
+def resnet44(num_classes=10):
+    return ResNet(BasicBlock, 7, num_classes)
 
 
-def resnet56():
-    return ResNet(BasicBlock, 9)
+def resnet56(num_classes=10):
+    return ResNet(BasicBlock, 9, num_classes)
 
 
-def resnet110():
-    return ResNet(BasicBlock, 18)
+def resnet110(num_classes=10):
+    return ResNet(BasicBlock, 18, num_classes)
 
 
-def resnet1202():
-    return ResNet(BasicBlock, 200)
+def resnet1202(num_classes=10):
+    return ResNet(BasicBlock, 200, num_classes)
