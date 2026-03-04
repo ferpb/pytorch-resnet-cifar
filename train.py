@@ -156,7 +156,7 @@ def main(args):
         results_dir = None
         log_file = None
 
-    log_string(str(vars(args)), log_file)
+    log_string(json.dumps(vars(args)), log_file)
 
     step = 0
     last_step = False
