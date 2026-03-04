@@ -107,17 +107,21 @@ def main(args):
         std=[0.2470, 0.2435, 0.2616],
     )
 
-    train_transform = transforms.Compose([
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomCrop(32, 4),
-        transforms.ToTensor(),
-        normalize,
-    ])
+    train_transform = transforms.Compose(
+        [
+            transforms.RandomCrop(32, 4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            normalize,
+        ]
+    )
 
-    eval_transform = transforms.Compose([
-        transforms.ToTensor(),
-        normalize,
-    ])
+    eval_transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            normalize,
+        ]
+    )
 
     train_data = datasets.CIFAR10("./data", train=True, download=True, transform=train_transform)
     train_eval_data = datasets.CIFAR10("./data", train=True, download=True, transform=eval_transform)
@@ -127,10 +131,16 @@ def main(args):
     orig_model.to(args.device)
     model = torch.compile(orig_model)
 
-    optimizer = torch.optim.SGD(orig_model.parameters(), lr=args.initial_lr, momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = torch.optim.SGD(
+        orig_model.parameters(), lr=args.initial_lr, momentum=args.momentum, weight_decay=args.weight_decay
+    )
 
-    train_loader = torch.utils.data.DataLoader(train_data, args.batch_size, shuffle=True, num_workers=8, pin_memory=True, drop_last=True)
-    train_eval_loader = torch.utils.data.DataLoader(train_eval_data, args.batch_size, shuffle=False, num_workers=8, pin_memory=True)
+    train_loader = torch.utils.data.DataLoader(
+        train_data, args.batch_size, shuffle=True, num_workers=8, pin_memory=True, drop_last=True
+    )
+    train_eval_loader = torch.utils.data.DataLoader(
+        train_eval_data, args.batch_size, shuffle=False, num_workers=8, pin_memory=True
+    )
     test_loader = torch.utils.data.DataLoader(test_data, args.batch_size, shuffle=False, num_workers=8, pin_memory=True)
 
     # logging

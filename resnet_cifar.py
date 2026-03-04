@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class LambdaLayer(nn.Module):
     def __init__(self, fn):
         super(LambdaLayer, self).__init__()
-        self.fn= fn
+        self.fn = fn
 
     def forward(self, x):
         return self.fn(x)
@@ -26,10 +26,11 @@ class BasicBlock(nn.Module):
 
         self.downsample = nn.Identity()
         if stride != 1 or in_planes != out_planes:
-            if shortcut_option == 'A':
-                self.downsample = LambdaLayer(lambda x:
-                                              F.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, out_planes//4, out_planes//4)))
-            elif shortcut_option == 'B':
+            if shortcut_option == "A":
+                self.downsample = LambdaLayer(
+                    lambda x: F.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, out_planes // 4, out_planes // 4))
+                )
+            elif shortcut_option == "B":
                 self.downsample = nn.Sequential(
                     nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=2, bias=False),
                     nn.BatchNorm2d(out_planes),
@@ -80,17 +81,22 @@ class ResNet(nn.Module):
 def resnet20():
     return ResNet(BasicBlock, 3)
 
+
 def resnet32():
     return ResNet(BasicBlock, 5)
+
 
 def resnet44():
     return ResNet(BasicBlock, 7)
 
+
 def resnet56():
     return ResNet(BasicBlock, 9)
 
+
 def resnet110():
     return ResNet(BasicBlock, 18)
+
 
 def resnet1202():
     return ResNet(BasicBlock, 200)
