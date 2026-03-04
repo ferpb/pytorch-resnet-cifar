@@ -72,7 +72,7 @@ class ResNet(nn.Module):
         x = self.stage1(x)
         x = self.stage2(x)
         x = self.stage3(x)
-        x = F.avg_pool2d(x, x.size()[3])
+        x = F.adaptive_avg_pool2d(x, 1)
         x = x.view(x.size(0), -1)
         x = self.linear(x)
         return x
