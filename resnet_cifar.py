@@ -59,6 +59,8 @@ class ResNet(nn.Module):
 
         self.linear = nn.Linear(64, num_classes)
 
+        self.apply(self._init_weights)
+
     def _make_stage(self, block_cls, planes, num_blocks, stride, shotcut_option):
         strides = [stride] + [1] * (num_blocks - 1)
         layers = []
@@ -66,6 +68,17 @@ class ResNet(nn.Module):
             layers.append(block_cls(self.in_planes, planes, stride, shotcut_option))
             self.in_planes = planes
         return nn.Sequential(*layers)
+
+    @staticmethod
+    def _init_weights(m):
+        if isinstance(m, nn.Conv2d):
+            nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+        elif isinstance(m, nn.BatchNorm2d):
+            nn.init.constant_(m.weight, 1)
+            nn.init.constant_(m.bias, 0)
+        elif isinstance(m, nn.Linear):
+            nn.init.kaiming_normal_(m.weight)
+            nn.init.constant_(m.bias, 0)
 
     def forward(self, x):
         x = F.relu(self.bn1(self.conv1(x)))
